@@ -23,13 +23,12 @@ export function P2P() {
     setError(null);
 
     try {
-      const { data } = await axios.post(`http://localhost:3000/api/p2p`, {
+      const { data }: any = await axios.post(`http://localhost:3000/api/p2p`, {
         username,
         amount,
       });
       console.log(data);
-      
-      setResponse(data.message);
+      setResponse(data?.message);
     } catch (error: any) {
       setError(error?.response?.data?.message || "An error occurred");
     } finally {
@@ -38,40 +37,38 @@ export function P2P() {
   };
 
   return (
-    <div className="h-[90vh]">
-      <Card title="Send">
-        <div className="min-w-72 pt-2">
-          <TextInput
-            placeholder="Username"
-            label="Username"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setUsername(event.target.value)
+    <Card title="Send">
+      <div className="pt-2">
+        <TextInput
+          placeholder="Username"
+          label="Username"
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setUsername(event.target.value)
+          }
+        />
+        <TextInput
+          placeholder="Amount"
+          label="Amount"
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setAmount(event.target.value)
+          }
+        />
+        <div className="pt-4 flex justify-center">
+          <Button
+            onClick={() =>
+              makeP2PTransaction({
+                username,
+                amount: Number(amount),
+              })
             }
-          />
-          <TextInput
-            placeholder="Amount"
-            label="Amount"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setAmount(event.target.value)
-            }
-          />
-          <div className="pt-4 flex justify-center">
-            <Button
-              onClick={() =>
-                makeP2PTransaction({
-                  username,
-                  amount: Number(amount),
-                })
-              }
-              disabled={loading}
-            >
-              {loading ? "Sending..." : "Send"}
-            </Button>
-          </div>
-          {error && <p className="text-red-500 mt-2">{error}</p>}
-          {response && <p className="text-green-500 mt-2">{response}</p>}
+            // disabled={loading}
+          >
+            {loading ? "Sending..." : "Send"}
+          </Button>
         </div>
-      </Card>
-    </div>
+        {error && <p className="text-red-500 mt-2">{error}</p>}
+        {response && <p className="text-green-500 mt-2">{response}</p>}
+      </div>
+    </Card>
   );
 }

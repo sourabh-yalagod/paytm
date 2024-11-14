@@ -11,7 +11,6 @@ interface P2PProps {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
-
   if (!session || !userId) {
     return NextResponse.json(
       {
@@ -36,38 +35,45 @@ export async function POST(req: NextRequest) {
 
   try {
     const result = await db.$transaction(async (tx) => {
-      // Perform the first operation: find the sender by userId
       const sender = await tx.user.findUnique({
         where: { id: userId },
       });
-      console.log("sender : ",sender);
-      
-      // Perform the second operation: find the receiver by username
       const receiver = await tx.user.findUnique({
         where: { username },
       });
-      
-      console.log("receiver : ",receiver);
-      // Check if the sender and receiver exist and the sender has enough funds
       if (!sender || !receiver) throw new Error("User not found");
-      
-      // Update sender's balance
-      const senderBalance = await tx.balance.update({
+      const senderBalance = await tx.balance.updateMany({
         where: { userId: sender.id },
         data: { amount: { decrement: amount } },
       });
-      console.log("senderBalance : ",senderBalance);
-      
-      // Update receiver's balance
       const receiverBalance = await tx.balance.updateMany({
         where: { userId: receiver.id },
         data: { amount: { increment: amount } },
       });
-      console.log("receiverBalance : ",receiverBalance);
-    
+      await tx.onRampTransactions.create({
+        data: {
+          provider: "provider",
+          amount: -amount,
+          type: "P2P",
+          startTime: new Date(),
+          status: "Success",
+          token: Math.random().toString(),
+          userId: sender.id,
+        },
+      });
+      await tx.onRampTransactions.create({
+        data: {
+          provider: "provider",
+          amount: amount,
+          type: "P2P",
+          startTime: new Date(),
+          status: "Success",
+          token: Math.random().toString(),
+          userId: receiver.id,
+        },
+      });
       return { sender, receiver };
     });
-    
 
     return NextResponse.json(
       {
@@ -76,14 +82,53 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Transaction error:", error);
     return NextResponse.json(
       {
         success: false,
-        message: error.message || "Transaction failed.",
+        message: error?.message || "Transaction failed.",
       },
       { status: 500 }
     );
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+  if (!session || !userId) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "User unauthorized",
+      },
+      { status: 401 }
+    );
+  }
+  try {
+    const p2pTransactions = await db.onRampTransactions.findMany({
+      where: {
+        userId,
+        type: "P2P",
+      },
+    });
+    const userBalance = await db.balance.findFirst({
+      where: {
+        userId,
+      },
+    });
+    return NextResponse.json({
+      transaction: p2pTransactions,
+      userBalance,
+      success: true,
+      message: "p2p Transactions are fetched successfully.",
+    });
+  } catch (error: any) {
+    console.log(error);
+    return NextResponse.json({
+      success: false,
+      message: "p2p Transactions failed to fetch.",
+    });
   }
 }

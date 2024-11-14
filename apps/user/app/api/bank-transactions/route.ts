@@ -5,7 +5,6 @@ import { authOptions } from "../../lib/auth";
 
 export async function GET(req: NextRequest) {
   try {
-    let balace = 0;
     const session = await getServerSession(authOptions);
     const userId = session?.user?.id;
 
@@ -14,7 +13,7 @@ export async function GET(req: NextRequest) {
     }
 
     const onRampTransactions = await db.onRampTransactions.findMany({
-      where: { userId },
+      where: { userId, type: "Deposite" },
     });
     const userBalance = await db.balance.findFirst({
       where: {

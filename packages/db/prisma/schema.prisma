@@ -35,6 +35,7 @@ model Balance {
 
 model onRampTransactions {
   id        String                  @id @default(uuid())
+  type      TransactionType
   startTime DateTime
   provider  String
   amount    Float                   @default(0)
@@ -48,6 +49,11 @@ enum OnRampTransactionStatus {
   Pending
   Success
   Failed
+}
+
+enum TransactionType {
+  Deposite
+  P2P
 }
 
 enum auth_type {

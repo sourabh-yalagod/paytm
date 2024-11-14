@@ -1,7 +1,4 @@
 "use server";
-import db from "@repo/db/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../auth";
 import axios from "axios";
 
 export const p2pTransfer = async (username: string, amount: number) => {
