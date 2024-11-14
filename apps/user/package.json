@@ -12,6 +12,7 @@
     "@repo/db": "*",
     "@repo/ui": "*",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.7.7",
     "next": "^14.2.16",
     "next-auth": "^4.24.10",
     "react": "18.3.1",
