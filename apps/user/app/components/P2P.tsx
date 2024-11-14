@@ -4,6 +4,7 @@ import { Card } from "@repo/ui/card";
 import { TextInput } from "@repo/ui/textInputBox";
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export function P2P() {
   const [username, setUsername] = useState("");
@@ -11,6 +12,7 @@ export function P2P() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [response, setResponse] = useState<string | null>(null);
+  const router = useRouter();
 
   const makeP2PTransaction = async ({
     username,
@@ -21,7 +23,6 @@ export function P2P() {
   }) => {
     setLoading(true);
     setError(null);
-
     try {
       const { data }: any = await axios.post(`http://localhost:3000/api/p2p`, {
         username,
@@ -53,7 +54,7 @@ export function P2P() {
             setAmount(event.target.value)
           }
         />
-        <div className="pt-4 flex justify-center">
+        <div className="pt-4 flex justify-around">
           <Button
             onClick={() =>
               makeP2PTransaction({
@@ -64,6 +65,9 @@ export function P2P() {
             // disabled={loading}
           >
             {loading ? "Sending..." : "Send"}
+          </Button>
+          <Button className="bg-red-600" onClick={() => router.back()}>
+            Back
           </Button>
         </div>
         {error && <p className="text-red-500 mt-2">{error}</p>}

@@ -8,7 +8,8 @@
     "./code": "./src/code.tsx",
     "./sideMenuItem": "./src/SideMenuItem.tsx",
     "./textInputBox": "./src/TextInputBox.tsx",
-    "./select": "./src/Select.tsx"
+    "./select": "./src/Select.tsx",
+    "./authStatus": "./src/AuthStatus.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
