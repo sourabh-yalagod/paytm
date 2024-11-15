@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import db from "@repo/db/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../lib/auth";
+import NodeCache from "node-cache";
 
 interface P2PProps {
   username: string;
   amount: number;
 }
+const cache = new NodeCache({ stdTTL: 60, checkperiod: 120 });
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -107,6 +109,12 @@ export async function GET(req: NextRequest) {
     );
   }
   try {
+    const cacheId = `P2P_${userId}`;
+    const cachedP2pTransactions = cache.get(cacheId);
+    if (cachedP2pTransactions) {
+      console.log('from cache');
+      return NextResponse.json(cachedP2pTransactions);
+    }
     const p2pTransactions = await db.onRampTransactions.findMany({
       where: {
         userId,
@@ -118,12 +126,16 @@ export async function GET(req: NextRequest) {
         userId,
       },
     });
-    return NextResponse.json({
+    const p2pResponse: any = {
       transaction: p2pTransactions,
       userBalance,
       success: true,
       message: "p2p Transactions are fetched successfully.",
-    });
+    };
+    console.log('from DB');
+    cache.set(cacheId, p2pResponse);
+    return NextResponse.json(p2pResponse);
+
   } catch (error: any) {
     console.log(error);
     return NextResponse.json({
