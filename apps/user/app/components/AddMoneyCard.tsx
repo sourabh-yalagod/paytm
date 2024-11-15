@@ -1,10 +1,12 @@
 import { Button } from "@repo/ui/button";
 import { Card } from "@repo/ui/card";
 import { Select } from "@repo/ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextInput } from "@repo/ui/textInputBox";
 import { createOnRampTransaction } from "../lib/actions/createOnRampTransaction";
 import { Loader2 } from "lucide-react";
+import { usePendingTransaction } from "@repo/state-management";
+import { useSession } from "next-auth/react";
 
 const SUPPORTED_BANKS = [
   { name: "Select Bank", redirectUrl: "" },
@@ -13,6 +15,8 @@ const SUPPORTED_BANKS = [
 ];
 
 export const AddMoneyCard = () => {
+  const id = useSession()?.data?.user?.id;
+  const { pendingTransaction, updateTransaction } = usePendingTransaction();
   const [amount, setAmount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [provider, setProvider] = useState<string>("Bank Provider");
@@ -23,15 +27,21 @@ export const AddMoneyCard = () => {
   const handleAddMoney = async () => {
     setLoading(true);
     try {
+      updateTransaction({
+        id: id || "",
+        startTime: new Date(),
+        amount: amount,
+        status: "Pending",
+        provider: provider,
+      });
       await createOnRampTransaction(amount, provider);
     } catch (error) {
       console.error("Error creating transaction:", error);
     } finally {
       setLoading(false);
+      console.log("pendingTransaction : ",pendingTransaction);
     }
   };
-  console.log(provider);
-
   return (
     <Card title="Add Money">
       <div className="w-full">

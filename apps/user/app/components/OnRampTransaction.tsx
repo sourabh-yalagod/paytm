@@ -1,6 +1,7 @@
-"use client";
+import { usePendingTransaction } from "@repo/state-management";
 import { Card } from "@repo/ui/card";
 import { Clock10 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -19,11 +20,21 @@ export const OnRampTransactions = ({
   const [option, setOption] = useState("latest");
   const [sortedList, setSortedList] = useState(transactions);
   const router = useRouter();
+  const { pendingTransaction } = usePendingTransaction();
+
+  // const pendingTransaction = {
+  //   startTime: new Date(),
+  //   amount: 0,
+  //   status: "dummy",
+  //   provider: Math.random(),
+  // };
 
   const sortArray = (array: any[], option: string) => {
     if (!array?.length) return; // Return if array is undefined or empty
 
-    let sortedArray = [...array];
+    let sortedArray = pendingTransaction?.amount
+      ? [pendingTransaction, ...array]
+      : [...array];
     switch (option) {
       case "latest":
         sortedArray.sort(
@@ -81,7 +92,10 @@ export const OnRampTransactions = ({
         <option value="failed">Failed</option>
       </select>
       {sortedList?.length ? (
-        sortedList.map((t: any, index) => (
+        (pendingTransaction.amount
+          ? [pendingTransaction, ...sortedList]
+          : sortedList
+        )?.map((t: any, index) => (
           <div
             onClick={() => router.push(`/transactions/${t.id}`)}
             key={index}

@@ -5,6 +5,8 @@ import { TextInput } from "@repo/ui/textInputBox";
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { usePendingTransaction } from "@repo/state-management";
+import { useSession } from "next-auth/react";
 
 export function P2P() {
   const [username, setUsername] = useState("");
@@ -13,7 +15,8 @@ export function P2P() {
   const [error, setError] = useState<string | null>(null);
   const [response, setResponse] = useState<string | null>(null);
   const router = useRouter();
-
+  const { updateTransaction } = usePendingTransaction();
+  const id = useSession().data?.user?.id;
   const makeP2PTransaction = async ({
     username,
     amount,
@@ -21,6 +24,13 @@ export function P2P() {
     username: string;
     amount: number;
   }) => {
+    updateTransaction({
+      id,
+      amount,
+      provider: "",
+      startTime: new Date(),
+      status: "Pending",
+    });
     setLoading(true);
     setError(null);
     try {
@@ -28,7 +38,7 @@ export function P2P() {
         username,
         amount,
       });
-      console.log(data);
+
       setResponse(data?.message);
     } catch (error: any) {
       setError(error?.response?.data?.message || "An error occurred");
