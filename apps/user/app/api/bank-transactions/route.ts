@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 import db from "@repo/db/client";
 import { getServerSession } from "next-auth";
@@ -16,9 +18,7 @@ export async function GET(req: NextRequest) {
       where: { userId, type: "Deposite" },
     });
     const userBalance = await db.balance.findFirst({
-      where: {
-        userId: userId,
-      },
+      where: { userId },
     });
 
     return NextResponse.json({

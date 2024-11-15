@@ -48,8 +48,8 @@ export const OnRampTransactions = ({
         break;
       case "success":
         sortedArray = sortedArray.filter((a) => a.status === "Success");
-        console.log("sortArray : ",sortArray)
-
+        console.log("sortArray : ", sortArray);
+        break;
       default:
         break;
     }
@@ -63,7 +63,7 @@ export const OnRampTransactions = ({
   }, [transactions, option]);
 
   return (
-    <div className="space-y-3 border w-full p-2 max-h-[500px] overflow-scroll rounded-lg py-3">
+    <div className="space-y-3 border w-full p-2 h-full sm:max-h-[500px] overflow-scroll rounded-lg py-3">
       <div className="flex items-center gap-4">
         <Clock10 className="animate-spin" />
         <p className="font-bold text-2xl">Transaction History:</p>
