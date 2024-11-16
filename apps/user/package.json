@@ -11,6 +11,7 @@
   "dependencies": {
     "@repo/db": "*",
     "@repo/ui": "*",
+    "@repo/state-management": "*",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
