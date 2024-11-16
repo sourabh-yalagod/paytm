@@ -16,7 +16,8 @@ export function P2P() {
   const [response, setResponse] = useState<string | null>(null);
   const router = useRouter();
   const { updateTransaction } = usePendingTransaction();
-  const id = useSession().data?.user?.id;
+  const session: any = useSession();
+  const id: any = session.data?.user?.id;
   const makeP2PTransaction = async ({
     username,
     amount,

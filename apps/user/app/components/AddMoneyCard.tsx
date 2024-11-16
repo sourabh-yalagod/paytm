@@ -15,7 +15,8 @@ const SUPPORTED_BANKS = [
 ];
 
 export const AddMoneyCard = () => {
-  const id = useSession()?.data?.user?.id;
+  const session: any = useSession();
+  const id: any = session.data?.user?.id;
   const { pendingTransaction, updateTransaction } = usePendingTransaction();
   const [amount, setAmount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,7 +40,7 @@ export const AddMoneyCard = () => {
       console.error("Error creating transaction:", error);
     } finally {
       setLoading(false);
-      console.log("pendingTransaction : ",pendingTransaction);
+      console.log("pendingTransaction : ", pendingTransaction);
     }
   };
   return (
